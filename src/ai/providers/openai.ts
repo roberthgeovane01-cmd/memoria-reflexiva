@@ -13,7 +13,63 @@ import { toStrictJsonSchema } from "./json-schema";
 
 /** Modelos de raciocínio não aceitam `temperature`. */
 function supportsTemperature(model: string): boolean {
-  return !/^(gpt-5|o[1-9])/.test(model);
+  return !isReasoningModel(model);
+}
+
+function isReasoningModel(model: string): boolean {
+  return /^(gpt-5|o[1-9])/.test(model);
+}
+
+type ReasoningEffort = "minimal" | "low" | "medium" | "high";
+
+/**
+ * Em modelos de raciocínio, `max_output_tokens` cobre TAMBÉM os tokens de
+ * raciocínio, que nunca aparecem na resposta. Um orçamento apertado faz o
+ * modelo gastar tudo pensando e devolver texto vazio, sem erro do fornecedor —
+ * foi exatamente o que aconteceu com o `episode_builder` sobre uma transcrição
+ * de sete minutos. Reservamos espaço para o raciocínio além do que a chamada
+ * pediu para escrever.
+ */
+const RESERVA_DE_RACIOCINIO = 6000;
+
+function outputBudget(
+  model: string,
+  requested: number | undefined,
+  factor = 1,
+): number | undefined {
+  if (!requested) return undefined;
+  if (!isReasoningModel(model)) return requested;
+  return requested + RESERVA_DE_RACIOCINIO * factor;
+}
+
+function reasoningOption(model: string, effort: ReasoningEffort) {
+  return isReasoningModel(model) ? { reasoning: { effort } } : {};
+}
+
+/** A resposta ficou incompleta porque o orçamento acabou antes da escrita. */
+function ranOutOfBudget(response: {
+  status?: string | null;
+  incomplete_details?: unknown;
+}): boolean {
+  if (response.status !== "incomplete") return false;
+  const reason = (response.incomplete_details as { reason?: string } | null | undefined)?.reason;
+  return reason === "max_output_tokens" || reason === undefined;
+}
+
+function emptyResponseError(
+  model: string,
+  promptName: string,
+  response: { status?: string | null; incomplete_details?: unknown },
+): Error {
+  const reason = (response.incomplete_details as { reason?: string } | null | undefined)?.reason;
+  if (response.status === "incomplete") {
+    return new Error(
+      `O modelo ${model} não conseguiu concluir ${promptName}: a resposta foi ` +
+        `interrompida (${reason ?? "motivo não informado"}). Tente de novo com um ` +
+        `relato mais curto ou avise para aumentar o orçamento de tokens.`,
+    );
+  }
+  return new Error(`Resposta vazia do modelo ${model} (${promptName}).`);
 }
 
 function makeUsage(
@@ -89,28 +145,40 @@ export class OpenAILanguageModelProvider implements LanguageModelProvider {
     const startedAt = Date.now();
     const model = request.model ?? this.defaultModel;
 
-    const response = await this.client.responses.create({
-      model,
-      instructions: request.system,
-      input: request.user,
-      ...(supportsTemperature(model) && request.temperature !== undefined
-        ? { temperature: request.temperature }
-        : {}),
-      ...(request.maxOutputTokens ? { max_output_tokens: request.maxOutputTokens } : {}),
-      text: {
-        format: {
-          type: "json_schema",
-          ...(toStrictJsonSchema(request.schema, request.schemaName) as {
-            name: string;
-            schema: Record<string, unknown>;
-            strict: boolean;
-          }),
-        },
-      },
-    });
+    const format = {
+      type: "json_schema" as const,
+      ...(toStrictJsonSchema(request.schema, request.schemaName) as {
+        name: string;
+        schema: Record<string, unknown>;
+        strict: boolean;
+      }),
+    };
+
+    const call = async (factor: number, effort: ReasoningEffort) => {
+      const budget = outputBudget(model, request.maxOutputTokens, factor);
+      return this.client.responses.create({
+        model,
+        instructions: request.system,
+        input: request.user,
+        ...(supportsTemperature(model) && request.temperature !== undefined
+          ? { temperature: request.temperature }
+          : {}),
+        ...(budget ? { max_output_tokens: budget } : {}),
+        ...reasoningOption(model, effort),
+        text: { format },
+      });
+    };
+
+    let response = await call(1, "low");
+
+    // Segunda e última tentativa: mais orçamento e o mínimo de raciocínio.
+    // Sem isto, uma entrada longa devolve texto vazio silenciosamente.
+    if (!response.output_text && ranOutOfBudget(response) && isReasoningModel(model)) {
+      response = await call(3, "minimal");
+    }
 
     const raw = response.output_text;
-    if (!raw) throw new Error(`Resposta vazia do modelo ${model} (${request.promptName}).`);
+    if (!raw) throw emptyResponseError(model, request.promptName, response);
 
     let parsedJson: unknown;
     try {
@@ -131,18 +199,27 @@ export class OpenAILanguageModelProvider implements LanguageModelProvider {
     const startedAt = Date.now();
     const model = request.model ?? this.defaultModel;
 
-    const response = await this.client.responses.create({
-      model,
-      instructions: request.system,
-      input: request.user,
-      ...(supportsTemperature(model) && request.temperature !== undefined
-        ? { temperature: request.temperature }
-        : {}),
-      ...(request.maxOutputTokens ? { max_output_tokens: request.maxOutputTokens } : {}),
-    });
+    const call = async (factor: number, effort: ReasoningEffort) => {
+      const budget = outputBudget(model, request.maxOutputTokens, factor);
+      return this.client.responses.create({
+        model,
+        instructions: request.system,
+        input: request.user,
+        ...(supportsTemperature(model) && request.temperature !== undefined
+          ? { temperature: request.temperature }
+          : {}),
+        ...(budget ? { max_output_tokens: budget } : {}),
+        ...reasoningOption(model, effort),
+      });
+    };
+
+    let response = await call(1, "low");
+    if (!response.output_text?.trim() && ranOutOfBudget(response) && isReasoningModel(model)) {
+      response = await call(3, "minimal");
+    }
 
     const text = response.output_text?.trim();
-    if (!text) throw new Error(`Resposta vazia do modelo ${model} (${request.promptName}).`);
+    if (!text) throw emptyResponseError(model, request.promptName, response);
     return { value: text, usage: makeUsage(model, startedAt, response.usage) };
   }
 }
