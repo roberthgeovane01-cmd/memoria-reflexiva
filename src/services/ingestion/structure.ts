@@ -37,10 +37,7 @@ const ROMAN = /^\s*([IVXLCDM]{1,7})[.)–-]?\s*$/;
  * Se nada disso aparecer, o documento é tratado como `flat`: uma única seção.
  * Nunca inventamos capítulos que não existem.
  */
-export function detectSections(
-  text: string,
-  pageOffsets: number[] | null = null,
-): StructureResult {
+export function detectSections(text: string, pageOffsets: number[] | null = null): StructureResult {
   const headings = findHeadings(text);
 
   if (headings.length < 2) {

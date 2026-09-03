@@ -3,13 +3,7 @@ import { getEmbeddingProvider } from "@/ai/providers";
 import type { ProviderUsage } from "@/ai/providers/types";
 
 export type OwnerKind =
-  | "source_summary"
-  | "section_summary"
-  | "chunk"
-  | "claim"
-  | "concept"
-  | "episode"
-  | "reflection";
+  "source_summary" | "section_summary" | "chunk" | "claim" | "concept" | "episode" | "reflection";
 
 export type EmbeddingTarget = {
   ownerKind: OwnerKind;

@@ -26,7 +26,13 @@ import {
 export type InvestigationResult = {
   dossierId: string;
   dossier: MemoryDossier;
-  conflicts: Array<{ id: string; kind: string; severity: string; blocking: boolean; title: string }>;
+  conflicts: Array<{
+    id: string;
+    kind: string;
+    severity: string;
+    blocking: boolean;
+    title: string;
+  }>;
   blocking: boolean;
   classifications: EvidenceClassification;
   demo: boolean;
@@ -102,8 +108,7 @@ export async function runInvestigation(
     schema: ConflictAnalysisSchema,
     schemaName: CONFLICT_ANALYZER.schemaName!,
     maxOutputTokens: 3000,
-    demoFallback: () =>
-      heuristicConflictAnalysis(input.speechText, evidence, classifications),
+    demoFallback: () => heuristicConflictAnalysis(input.speechText, evidence, classifications),
   });
   const conflictAnalysis = filterKnownConflicts(conflictResult.value, evidence);
 
@@ -184,7 +189,14 @@ export async function runInvestigation(
   const dossierId = dossierRow.id as string;
 
   // Rastreabilidade: cada achado do dossiê aponta para as evidências reais.
-  const evidenceRows = buildDossierEvidence(dossierId, input.workspaceId, dossier, classifications, evidence, input.userId);
+  const evidenceRows = buildDossierEvidence(
+    dossierId,
+    input.workspaceId,
+    dossier,
+    classifications,
+    evidence,
+    input.userId,
+  );
   if (evidenceRows.length) {
     const { error } = await supabase.from("dossier_evidence").insert(evidenceRows);
     if (error) throw error;
@@ -258,9 +270,7 @@ function renderEvidence(
   evidence: EvidenceItem[],
   classifications?: EvidenceClassification,
 ): string {
-  const byId = new Map(
-    (classifications?.classifications ?? []).map((c) => [c.evidence_id, c]),
-  );
+  const byId = new Map((classifications?.classifications ?? []).map((c) => [c.evidence_id, c]));
   return evidence
     .map((item, index) => {
       const classification = byId.get(item.hitId);
@@ -340,8 +350,7 @@ function sanitizeDossier(dossier: MemoryDossier, evidence: EvidenceItem[]): Memo
   const complements = clean(dossier.complements);
   const tensions = clean(dossier.tensions);
   const contradictions = clean(dossier.contradictions);
-  const total =
-    convergences.length + complements.length + tensions.length + contradictions.length;
+  const total = convergences.length + complements.length + tensions.length + contradictions.length;
 
   return {
     ...dossier,
@@ -372,7 +381,8 @@ function coverage(dossier: MemoryDossier, evidence: EvidenceItem[]): number {
     dossier.tensions,
     dossier.contradictions,
   ];
-  for (const group of groups) for (const item of group) for (const id of item.evidence_ids) cited.add(id);
+  for (const group of groups)
+    for (const item of group) for (const id of item.evidence_ids) cited.add(id);
   return Number((cited.size / evidence.length).toFixed(3));
 }
 
@@ -420,8 +430,12 @@ function buildDossierEvidence(
     }
   };
 
-  dossier.convergences.forEach((f, i) => push("convergences", i, "supports", f.evidence_ids, f.detail));
-  dossier.complements.forEach((f, i) => push("complements", i, "complements", f.evidence_ids, f.detail));
+  dossier.convergences.forEach((f, i) =>
+    push("convergences", i, "supports", f.evidence_ids, f.detail),
+  );
+  dossier.complements.forEach((f, i) =>
+    push("complements", i, "complements", f.evidence_ids, f.detail),
+  );
   dossier.tensions.forEach((f, i) => push("tensions", i, "qualifies", f.evidence_ids, f.detail));
   dossier.contradictions.forEach((f, i) =>
     push("contradictions", i, "contradicts", f.evidence_ids, f.detail),

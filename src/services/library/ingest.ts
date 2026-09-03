@@ -1,11 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getAnalystModel } from "@/ai/providers";
-import {
-  CLAIM_EXTRACTOR,
-  CONCEPT_EXTRACTOR,
-  SOURCE_SUMMARIZER,
-  wrapUntrusted,
-} from "@/ai/prompts";
+import { CLAIM_EXTRACTOR, CONCEPT_EXTRACTOR, SOURCE_SUMMARIZER, wrapUntrusted } from "@/ai/prompts";
 import {
   ClaimExtractionSchema,
   ConceptExtractionSchema,

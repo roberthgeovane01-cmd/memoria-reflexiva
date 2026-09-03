@@ -61,7 +61,7 @@ export function LinkButton({
     <a
       className={cn(
         "inline-flex items-center justify-center gap-2 rounded-[var(--radius)] font-medium",
-        "transition-colors no-underline",
+        "no-underline transition-colors",
         BUTTON_VARIANTS[variant ?? "secondary"],
         BUTTON_SIZES[size ?? "md"],
         className,
@@ -79,7 +79,7 @@ export function Card({
   return (
     <Tag
       className={cn(
-        "rounded-[var(--radius)] border border-line bg-surface",
+        "border-line bg-surface rounded-[var(--radius)] border",
         "shadow-[0_1px_2px_rgba(0,0,0,0.03)]",
         className,
       )}
@@ -89,7 +89,7 @@ export function Card({
 }
 
 export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("border-b border-line px-5 py-4", className)} {...props} />;
+  return <div className={cn("border-line border-b px-5 py-4", className)} {...props} />;
 }
 
 export function CardBody({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
@@ -99,20 +99,20 @@ export function CardBody({ className, ...props }: React.HTMLAttributes<HTMLDivEl
 export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h2
-      className={cn("font-serif text-lg leading-tight tracking-tight text-ink", className)}
+      className={cn("text-ink font-serif text-lg leading-tight tracking-tight", className)}
       {...props}
     />
   );
 }
 
 export function Muted({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={cn("text-sm text-ink-faint", className)} {...props} />;
+  return <p className={cn("text-ink-faint text-sm", className)} {...props} />;
 }
 
 export function Label({ className, ...props }: React.LabelHTMLAttributes<HTMLLabelElement>) {
   return (
     <label
-      className={cn("mb-1.5 block text-[13px] font-medium text-ink-soft", className)}
+      className={cn("text-ink-soft mb-1.5 block text-[13px] font-medium", className)}
       {...props}
     />
   );
@@ -131,7 +131,9 @@ export function Textarea({
   className,
   ...props
 }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return <textarea className={cn(FIELD_STYLES, "min-h-28 leading-relaxed", className)} {...props} />;
+  return (
+    <textarea className={cn(FIELD_STYLES, "min-h-28 leading-relaxed", className)} {...props} />
+  );
 }
 
 export function Select({ className, ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
@@ -139,14 +141,7 @@ export function Select({ className, ...props }: React.SelectHTMLAttributes<HTMLS
 }
 
 type BadgeTone =
-  | "neutral"
-  | "accent"
-  | "speech"
-  | "memory"
-  | "inference"
-  | "reflection"
-  | "danger"
-  | "success";
+  "neutral" | "accent" | "speech" | "memory" | "inference" | "reflection" | "danger" | "success";
 
 const BADGE_TONES: Record<BadgeTone, string> = {
   neutral: "bg-surface-2 text-ink-soft border-line",
@@ -189,8 +184,8 @@ export function PageHeader({
   return (
     <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
       <div className="max-w-2xl">
-        <h1 className="font-serif text-[28px] leading-tight tracking-tight text-ink">{title}</h1>
-        {description ? <div className="mt-2 text-sm text-ink-soft">{description}</div> : null}
+        <h1 className="text-ink font-serif text-[28px] leading-tight tracking-tight">{title}</h1>
+        {description ? <div className="text-ink-soft mt-2 text-sm">{description}</div> : null}
       </div>
       {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
     </header>
@@ -207,9 +202,9 @@ export function EmptyState({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-[var(--radius)] border border-dashed border-line-strong px-6 py-12 text-center">
-      <p className="font-serif text-lg text-ink">{title}</p>
-      <p className="mx-auto mt-2 max-w-md text-sm text-ink-faint">{description}</p>
+    <div className="border-line-strong rounded-[var(--radius)] border border-dashed px-6 py-12 text-center">
+      <p className="text-ink font-serif text-lg">{title}</p>
+      <p className="text-ink-faint mx-auto mt-2 max-w-md text-sm">{description}</p>
       {action ? <div className="mt-5 flex justify-center">{action}</div> : null}
     </div>
   );
@@ -244,7 +239,7 @@ export function Progress({ value, label }: { value: number; label?: string }) {
   return (
     <div>
       <div
-        className="h-1.5 w-full overflow-hidden rounded-full bg-surface-2"
+        className="bg-surface-2 h-1.5 w-full overflow-hidden rounded-full"
         role="progressbar"
         aria-valuenow={clamped}
         aria-valuemin={0}
@@ -252,11 +247,11 @@ export function Progress({ value, label }: { value: number; label?: string }) {
         aria-label={label ?? "Progresso"}
       >
         <div
-          className="h-full rounded-full bg-accent transition-[width] duration-500"
+          className="bg-accent h-full rounded-full transition-[width] duration-500"
           style={{ width: `${clamped}%` }}
         />
       </div>
-      {label ? <p className="mt-1.5 text-xs text-ink-faint">{label}</p> : null}
+      {label ? <p className="text-ink-faint mt-1.5 text-xs">{label}</p> : null}
     </div>
   );
 }

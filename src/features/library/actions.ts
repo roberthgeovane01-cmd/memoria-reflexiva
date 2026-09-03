@@ -152,7 +152,10 @@ export async function reprocessSource(sourceId: string): Promise<{ jobId: string
   if (error) throw error;
   if (!source.current_version_id) throw new Error("Este documento não tem arquivo associado.");
 
-  await supabase.from("processing_jobs").delete().eq("idempotency_key", `ingest:${source.current_version_id}`);
+  await supabase
+    .from("processing_jobs")
+    .delete()
+    .eq("idempotency_key", `ingest:${source.current_version_id}`);
   return enqueueIngestion(source.current_version_id as string);
 }
 

@@ -22,13 +22,13 @@ export function AppShell({
 }) {
   return (
     <div className="min-h-dvh md:flex">
-      <aside className="hidden w-64 shrink-0 border-r border-line bg-surface md:flex md:flex-col">
-        <div className="border-b border-line px-5 py-5">
+      <aside className="border-line bg-surface hidden w-64 shrink-0 border-r md:flex md:flex-col">
+        <div className="border-line border-b px-5 py-5">
           <Link href="/" className="block">
-            <p className="font-serif text-[17px] leading-tight tracking-tight text-ink">
+            <p className="text-ink font-serif text-[17px] leading-tight tracking-tight">
               Memória Reflexiva
             </p>
-            <p className="mt-0.5 truncate text-xs text-ink-faint">{user.workspaceName}</p>
+            <p className="text-ink-faint mt-0.5 truncate text-xs">{user.workspaceName}</p>
           </Link>
         </div>
 
@@ -36,18 +36,18 @@ export function AppShell({
           <NavLinks />
         </nav>
 
-        <div className="space-y-3 border-t border-line px-5 py-4">
+        <div className="border-line space-y-3 border-t px-5 py-4">
           {demoMode ? (
             <Badge tone="inference" className="w-full justify-center">
               modo demonstração
             </Badge>
           ) : null}
           <div className="flex items-center justify-between gap-2">
-            <p className="truncate text-xs text-ink-faint">{user.displayName ?? "você"}</p>
+            <p className="text-ink-faint truncate text-xs">{user.displayName ?? "você"}</p>
             <form action="/auth/sair" method="post">
               <button
                 type="submit"
-                className="text-xs text-ink-faint underline underline-offset-2 hover:text-ink"
+                className="text-ink-faint hover:text-ink text-xs underline underline-offset-2"
               >
                 sair
               </button>
@@ -57,7 +57,7 @@ export function AppShell({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-line bg-surface px-4 py-3 md:hidden">
+        <header className="border-line bg-surface flex items-center justify-between border-b px-4 py-3 md:hidden">
           <Link href="/" className="font-serif text-base tracking-tight">
             Memória Reflexiva
           </Link>
@@ -70,7 +70,7 @@ export function AppShell({
 
         <nav
           aria-label="Navegação"
-          className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 backdrop-blur md:hidden"
+          className="border-line bg-surface/95 fixed inset-x-0 bottom-0 z-40 border-t backdrop-blur md:hidden"
         >
           <NavLinks compact />
         </nav>

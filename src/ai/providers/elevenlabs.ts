@@ -17,9 +17,10 @@ export class ElevenLabsTextToSpeechProvider implements TextToSpeechProvider {
     private readonly defaultVoiceId: string,
   ) {}
 
-  async synthesize(input: { text: string; voiceId?: string }): Promise<
-    WithUsage<{ audio: Uint8Array; mimeType: string; voiceId: string }>
-  > {
+  async synthesize(input: {
+    text: string;
+    voiceId?: string;
+  }): Promise<WithUsage<{ audio: Uint8Array; mimeType: string; voiceId: string }>> {
     const startedAt = Date.now();
     const voiceId = input.voiceId?.trim() || this.defaultVoiceId;
 
@@ -39,9 +40,7 @@ export class ElevenLabsTextToSpeechProvider implements TextToSpeechProvider {
 
     if (!response.ok) {
       const detail = await response.text().catch(() => "");
-      throw new Error(
-        `ElevenLabs respondeu ${response.status}. ${detail.slice(0, 400)}`.trim(),
-      );
+      throw new Error(`ElevenLabs respondeu ${response.status}. ${detail.slice(0, 400)}`.trim());
     }
 
     const audio = new Uint8Array(await response.arrayBuffer());

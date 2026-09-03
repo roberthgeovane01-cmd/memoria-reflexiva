@@ -29,8 +29,7 @@ export function NavLinks({ compact = false }: { compact?: boolean }) {
   const pathname = usePathname();
   const items = compact ? ITEMS.filter((i) => i.compact) : ITEMS;
 
-  const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   if (compact) {
     return (
@@ -71,7 +70,7 @@ export function NavLinks({ compact = false }: { compact?: boolean }) {
               className={cn(
                 "flex items-center gap-2.5 rounded-[var(--radius)] px-3 py-2 text-sm transition-colors",
                 active
-                  ? "bg-accent-soft font-medium text-accent"
+                  ? "bg-accent-soft text-accent font-medium"
                   : "text-ink-soft hover:bg-surface-2 hover:text-ink",
               )}
             >

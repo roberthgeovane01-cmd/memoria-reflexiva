@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import type {
   EmbeddingProvider,
+  OcrResult,
   LanguageModelProvider,
   OcrProvider,
   ProviderUsage,
@@ -32,10 +33,12 @@ function usage(provider: string, model: string, startedAt: number): ProviderUsag
 // --------------------------------------------------------------------------
 
 const STOPWORDS = new Set(
-  ("a o e de da do das dos em no na nos nas um uma uns umas para por com sem sobre " +
+  (
+    "a o e de da do das dos em no na nos nas um uma uns umas para por com sem sobre " +
     "que se ao aos as os à às ou como mais mas nem já muito muita pouco pouca ser " +
     "estar tem ter foi era são eu você ele ela nós eles elas isso isto aquilo meu " +
-    "minha seu sua este esta esse essa pelo pela entre até quando onde porque")
+    "minha seu sua este esta esse essa pelo pela entre até quando onde porque"
+  )
     .split(" ")
     .filter(Boolean),
 );
@@ -216,13 +219,11 @@ export class MockOcrProvider implements OcrProvider {
   readonly name = "none";
   readonly available = false;
 
-  async recognize() {
+  async recognize(): Promise<WithUsage<OcrResult>> {
     throw new Error(
       "OCR não configurado. O documento fica com status ocr_required e não " +
         "entra na memória até que um texto utilizável exista.",
     );
-    // eslint-disable-next-line no-unreachable
-    return { value: { text: "", confidence: 0, pageCount: 0 }, usage: usage("none", "none", 0) };
   }
 }
 
@@ -267,7 +268,11 @@ export class HeuristicRerankingProvider implements RerankingProvider {
 
       const reasons = { similarity, pertinence, specificity, authority, recency };
       const score =
-        0.4 * similarity + 0.28 * pertinence + 0.1 * specificity + 0.16 * authority + 0.06 * recency;
+        0.4 * similarity +
+        0.28 * pertinence +
+        0.1 * specificity +
+        0.16 * authority +
+        0.06 * recency;
 
       return { id: candidate.id, score, reasons };
     });

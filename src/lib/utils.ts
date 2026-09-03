@@ -24,7 +24,13 @@ export function slugify(value: string): string {
 /** Nome de arquivo seguro para o Storage. */
 export function sanitizeFilename(name: string): string {
   const parts = deaccent(name).split(".");
-  const extension = parts.length > 1 ? parts.pop()!.toLowerCase().replace(/[^a-z0-9]/g, "") : "";
+  const extension =
+    parts.length > 1
+      ? parts
+          .pop()!
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, "")
+      : "";
   const base =
     parts
       .join(".")

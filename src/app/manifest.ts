@@ -4,8 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Memória Reflexiva",
     short_name: "Memória",
-    description:
-      "Biblioteca pessoal, memória em camadas e reflexão narrada por voz.",
+    description: "Biblioteca pessoal, memória em camadas e reflexão narrada por voz.",
     start_url: "/",
     display: "standalone",
     orientation: "portrait",

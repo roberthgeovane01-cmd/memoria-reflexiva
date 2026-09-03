@@ -36,12 +36,14 @@ export const QueryPlanSchema = z.object({
   entities: z.array(z.string()).max(20),
   claims: z.array(z.string()).max(12),
   contrasts: z.array(z.string()).max(8),
-  temporal_references: z.array(
-    z.object({
-      expression: z.string(),
-      normalized: z.string().nullable(),
-    }),
-  ).max(8),
+  temporal_references: z
+    .array(
+      z.object({
+        expression: z.string(),
+        normalized: z.string().nullable(),
+      }),
+    )
+    .max(8),
   queries: z
     .array(
       z.object({
@@ -107,13 +109,7 @@ export const EvidenceClassificationSchema = z.object({
   classifications: z.array(
     z.object({
       evidence_id: z.string(),
-      classification: z.enum([
-        "supports",
-        "complements",
-        "contradicts",
-        "qualifies",
-        "unrelated",
-      ]),
+      classification: z.enum(["supports", "complements", "contradicts", "qualifies", "unrelated"]),
       rationale: z.string(),
       confidence: z.number().min(0).max(1),
     }),
@@ -237,9 +233,7 @@ export const EpisodeSchema = z.object({
   occurred_on: z.string().nullable(),
   temporality: z.string().nullable(),
   themes: z.array(z.string()).max(10),
-  entities: z
-    .array(z.object({ name: z.string(), kind: z.string() }))
-    .max(15),
+  entities: z.array(z.object({ name: z.string(), kind: z.string() })).max(15),
   projects: z.array(z.string()).max(8),
 });
 export type Episode = z.infer<typeof EpisodeSchema>;

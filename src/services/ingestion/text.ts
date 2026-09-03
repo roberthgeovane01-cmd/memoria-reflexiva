@@ -53,7 +53,10 @@ const DOT_PLACEHOLDER = "\u0000";
 
 /** Divisão em frases, tolerante a abreviações comuns em português. */
 export function splitSentences(text: string): string[] {
-  const masked = text.replace(ABBREVIATIONS, (_m, word, space) => `${word}${DOT_PLACEHOLDER}${space}`);
+  const masked = text.replace(
+    ABBREVIATIONS,
+    (_m, word, space) => `${word}${DOT_PLACEHOLDER}${space}`,
+  );
   return masked
     .split(/(?<=[.!?…])\s+(?=[A-ZÀ-Þ"'«(—])/)
     .map((s) => s.split(DOT_PLACEHOLDER).join(".").trim())

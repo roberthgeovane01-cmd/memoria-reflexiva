@@ -158,7 +158,13 @@ describe("reranking heurístico", () => {
   it("explica cada componente do score", async () => {
     const provider = new HeuristicRerankingProvider();
     const { value } = await provider.rerank("lealdade", [
-      { id: "x", text: "A lealdade permanece.", fusionScore: 0.4, authorityLevel: 3, sourceId: "s" },
+      {
+        id: "x",
+        text: "A lealdade permanece.",
+        fusionScore: 0.4,
+        authorityLevel: 3,
+        sourceId: "s",
+      },
     ]);
     expect(Object.keys(value[0].reasons).sort()).toEqual([
       "authority",

@@ -8,7 +8,7 @@ export default function CadastroPage() {
   return (
     <>
       <SignUpForm />
-      <p className="mt-6 text-center text-sm text-ink-faint">
+      <p className="text-ink-faint mt-6 text-center text-sm">
         Já tem conta?{" "}
         <Link href="/entrar" className="text-accent underline underline-offset-2">
           Entrar

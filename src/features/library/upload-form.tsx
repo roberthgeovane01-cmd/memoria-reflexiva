@@ -128,8 +128,8 @@ export function UploadForm({ maxBytes }: { maxBytes: number }) {
       <CardHeader>
         <CardTitle>Adicionar à biblioteca</CardTitle>
         <Muted className="mt-1">
-          PDF com texto, DOCX, TXT ou Markdown. O arquivo original é preservado; o texto extraído
-          e as estruturas derivadas ficam separados dele.
+          PDF com texto, DOCX, TXT ou Markdown. O arquivo original é preservado; o texto extraído e
+          as estruturas derivadas ficam separados dele.
         </Muted>
       </CardHeader>
       <CardBody>
@@ -144,7 +144,7 @@ export function UploadForm({ maxBytes }: { maxBytes: number }) {
               accept=".pdf,.docx,.txt,.md,.markdown"
               required
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              className="w-full rounded-[var(--radius)] border border-line-strong bg-surface px-3 py-2 text-sm file:mr-3 file:rounded file:border-0 file:bg-surface-2 file:px-3 file:py-1.5 file:text-sm file:text-ink-soft"
+              className="border-line-strong bg-surface file:bg-surface-2 file:text-ink-soft w-full rounded-[var(--radius)] border px-3 py-2 text-sm file:mr-3 file:rounded file:border-0 file:px-3 file:py-1.5 file:text-sm"
             />
             {file ? (
               <Muted className="mt-1.5 text-xs">

@@ -57,19 +57,17 @@ export default async function DashboardPage() {
   return (
     <div className="mx-auto max-w-5xl">
       <header className="mb-8">
-        <p className="text-sm text-ink-faint">
-          {displayName ? `Olá, ${displayName}.` : "Olá."}
-        </p>
+        <p className="text-ink-faint text-sm">{displayName ? `Olá, ${displayName}.` : "Olá."}</p>
         <h1 className="mt-1 font-serif text-[30px] leading-tight tracking-tight">
           O que aconteceu hoje?
         </h1>
-        <p className="mt-2 max-w-xl text-sm text-ink-soft">
-          Grave um relato. Antes de escrever qualquer coisa, o sistema investiga a sua
-          biblioteca e monta um dossiê do que a memória tem a dizer.
+        <p className="text-ink-soft mt-2 max-w-xl text-sm">
+          Grave um relato. Antes de escrever qualquer coisa, o sistema investiga a sua biblioteca e
+          monta um dossiê do que a memória tem a dizer.
         </p>
       </header>
 
-      <Card className="mb-8 border-accent/30 bg-accent-soft/40">
+      <Card className="border-accent/30 bg-accent-soft/40 mb-8">
         <CardBody className="flex flex-col gap-4 py-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-serif text-xl tracking-tight">Nova reflexão</p>
@@ -91,10 +89,10 @@ export default async function DashboardPage() {
       {capabilities.demoMode ? (
         <div className="mb-8">
           <Alert tone="inference" title="Modo demonstração ativo">
-            Um ou mais provedores de IA não estão configurados. O fluxo inteiro funciona — a
-            busca, a investigação e o dossiê rodam por heurísticas determinísticas, e a interface
-            deixa isso explícito em cada resultado. Configure as chaves em Configurações para
-            ligar a análise completa.
+            Um ou mais provedores de IA não estão configurados. O fluxo inteiro funciona — a busca,
+            a investigação e o dossiê rodam por heurísticas determinísticas, e a interface deixa
+            isso explícito em cada resultado. Configure as chaves em Configurações para ligar a
+            análise completa.
           </Alert>
         </div>
       ) : null}
@@ -104,7 +102,7 @@ export default async function DashboardPage() {
           <CardBody>
             <p className="text-3xl font-light tabular-nums">{totalSources}</p>
             <Muted className="mt-1">documentos na biblioteca</Muted>
-            <p className="mt-3 text-xs text-ink-faint">
+            <p className="text-ink-faint mt-3 text-xs">
               {readySources} disponível(is) para a memória
             </p>
           </CardBody>
@@ -113,14 +111,14 @@ export default async function DashboardPage() {
           <CardBody>
             <p className="text-3xl font-light tabular-nums">{sessions.length}</p>
             <Muted className="mt-1">sessões recentes</Muted>
-            <p className="mt-3 text-xs text-ink-faint">{pending.length} aguardando você</p>
+            <p className="text-ink-faint mt-3 text-xs">{pending.length} aguardando você</p>
           </CardBody>
         </Card>
         <Card>
           <CardBody>
             <p className="text-3xl font-light tabular-nums">{processing.length}</p>
             <Muted className="mt-1">documentos em processamento</Muted>
-            <p className="mt-3 text-xs text-ink-faint">
+            <p className="text-ink-faint mt-3 text-xs">
               {processing.some((p) => p.status === "ocr_required")
                 ? "algum precisa de OCR"
                 : "nada travado"}
@@ -135,18 +133,18 @@ export default async function DashboardPage() {
             <CardTitle>Esperando a sua decisão</CardTitle>
             <Badge tone="accent">{pending.length}</Badge>
           </CardHeader>
-          <CardBody className="divide-y divide-line p-0">
+          <CardBody className="divide-line divide-y p-0">
             {pending.map((session) => (
               <Link
                 key={session.id}
                 href={`/mesa/${session.id}`}
-                className="flex items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-surface-2"
+                className="hover:bg-surface-2 flex items-center justify-between gap-4 px-5 py-3.5 transition-colors"
               >
                 <span className="min-w-0">
-                  <span className="block truncate text-sm text-ink">
+                  <span className="text-ink block truncate text-sm">
                     {session.central_question ?? "Sessão sem questão definida"}
                   </span>
-                  <span className="mt-0.5 block text-xs text-ink-faint">
+                  <span className="text-ink-faint mt-0.5 block text-xs">
                     {statusLabel(session.status as string)}
                   </span>
                 </span>
@@ -166,7 +164,7 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle>Reflexões recentes</CardTitle>
           </CardHeader>
-          <CardBody className={sessions.length ? "divide-y divide-line p-0" : ""}>
+          <CardBody className={sessions.length ? "divide-line divide-y p-0" : ""}>
             {sessions.length === 0 ? (
               <EmptyState
                 title="Nenhuma reflexão ainda"
@@ -177,12 +175,12 @@ export default async function DashboardPage() {
                 <Link
                   key={session.id}
                   href={`/mesa/${session.id}`}
-                  className="block px-5 py-3.5 transition-colors hover:bg-surface-2"
+                  className="hover:bg-surface-2 block px-5 py-3.5 transition-colors"
                 >
-                  <p className="truncate text-sm text-ink">
+                  <p className="text-ink truncate text-sm">
                     {truncate(session.central_question ?? "Sessão sem questão", 80)}
                   </p>
-                  <p className="mt-0.5 text-xs text-ink-faint">
+                  <p className="text-ink-faint mt-0.5 text-xs">
                     {formatDateTime(session.created_at as string)} ·{" "}
                     {statusLabel(session.status as string)}
                   </p>
@@ -216,7 +214,7 @@ export default async function DashboardPage() {
                         {source.status === "ocr_required" ? (
                           <AlertTriangle size={14} className="text-danger" aria-hidden />
                         ) : (
-                          <Loader2 size={14} className="animate-spin text-ink-faint" aria-hidden />
+                          <Loader2 size={14} className="text-ink-faint animate-spin" aria-hidden />
                         )}
                         <span className="min-w-0 flex-1 truncate">{source.title as string}</span>
                         <Badge tone={source.status === "ocr_required" ? "danger" : "neutral"}>
@@ -230,7 +228,7 @@ export default async function DashboardPage() {
                 )}
                 <Link
                   href="/biblioteca"
-                  className="inline-block text-sm text-accent underline underline-offset-2"
+                  className="text-accent inline-block text-sm underline underline-offset-2"
                 >
                   Abrir a biblioteca
                 </Link>

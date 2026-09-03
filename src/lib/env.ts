@@ -8,8 +8,7 @@ import { z } from "zod";
  * para o modo demonstração (mock determinístico) e a interface avisa.
  */
 
-const intFromEnv = (fallback: number) =>
-  z.coerce.number().int().positive().catch(fallback);
+const intFromEnv = (fallback: number) => z.coerce.number().int().positive().catch(fallback);
 
 const serverSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),

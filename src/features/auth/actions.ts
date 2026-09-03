@@ -63,8 +63,7 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
   if (!data.session) {
     return {
       error: null,
-      message:
-        "Conta criada. Confirme o endereço no e-mail que acabamos de enviar e depois entre.",
+      message: "Conta criada. Confirme o endereço no e-mail que acabamos de enviar e depois entre.",
     };
   }
 

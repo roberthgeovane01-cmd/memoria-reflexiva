@@ -1,9 +1,5 @@
 import { stem, tokenize } from "@/ai/providers/mock";
-import type {
-  ConflictAnalysis,
-  EvidenceClassification,
-  MemoryDossier,
-} from "@/ai/schemas";
+import type { ConflictAnalysis, EvidenceClassification, MemoryDossier } from "@/ai/schemas";
 import type { EvidenceItem } from "@/services/retrieval/engine";
 import { truncate } from "@/lib/utils";
 
@@ -17,7 +13,8 @@ import { truncate } from "@/lib/utils";
  */
 
 const NEGATION = /\b(n[ãa]o|nunca|jamais|nenhum|nenhuma|sem|tampouco|exceto|salvo)\b/i;
-const CONDITIONAL = /\b(mas|por[ée]m|contudo|entretanto|todavia|embora|apesar|desde que|a menos)\b/i;
+const CONDITIONAL =
+  /\b(mas|por[ée]m|contudo|entretanto|todavia|embora|apesar|desde que|a menos)\b/i;
 
 export function overlapRatio(a: string, b: string): number {
   const left = new Set(tokenize(a).map(stem));
@@ -35,7 +32,10 @@ export function extractYears(text: string): number[] {
 export function extractDatesPt(text: string): string[] {
   const months =
     "janeiro|fevereiro|mar[çc]o|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro";
-  const regex = new RegExp(`\\b(?:\\d{1,2}\\s+de\\s+)?(?:${months})(?:\\s+de\\s+(?:19|20)\\d{2})?\\b`, "gi");
+  const regex = new RegExp(
+    `\\b(?:\\d{1,2}\\s+de\\s+)?(?:${months})(?:\\s+de\\s+(?:19|20)\\d{2})?\\b`,
+    "gi",
+  );
   return [...text.matchAll(regex)].map((m) => m[0].toLowerCase());
 }
 
@@ -58,8 +58,7 @@ export function heuristicEvidenceClassification(
         rationale = "Sobreposição de vocabulário muito baixa com a fala atual.";
       } else if (polarityClash && ratio > 0.25) {
         classification = "contradicts";
-        rationale =
-          "Trata do mesmo assunto com polaridade invertida (um afirma, o outro nega).";
+        rationale = "Trata do mesmo assunto com polaridade invertida (um afirma, o outro nega).";
       } else if (CONDITIONAL.test(item.text) && ratio > 0.15) {
         classification = "qualifies";
         rationale = "Trata do assunto impondo uma ressalva ou condição.";
@@ -172,17 +171,18 @@ export function heuristicDossier(
     classifications.classifications
       .filter((c) => c.classification === kind)
       .map((c) => ({ classification: c, item: byId.get(c.evidence_id) }))
-      .filter((entry): entry is { classification: typeof entry.classification; item: EvidenceItem } =>
-        Boolean(entry.item),
+      .filter(
+        (entry): entry is { classification: typeof entry.classification; item: EvidenceItem } =>
+          Boolean(entry.item),
       );
 
-    const toFinding = (entries: ReturnType<typeof group>) =>
-      entries.slice(0, 6).map((entry) => ({
-        statement: `${entry.item.sourceTitle}: ${truncate(entry.item.text, 160)}`,
-        detail: entry.classification.rationale,
-        evidence_ids: [entry.item.hitId],
-        source_ids: entry.item.sourceId ? [entry.item.sourceId] : [],
-      }));
+  const toFinding = (entries: ReturnType<typeof group>) =>
+    entries.slice(0, 6).map((entry) => ({
+      statement: `${entry.item.sourceTitle}: ${truncate(entry.item.text, 160)}`,
+      detail: entry.classification.rationale,
+      evidence_ids: [entry.item.hitId],
+      source_ids: entry.item.sourceId ? [entry.item.sourceId] : [],
+    }));
 
   const supports = group("supports");
   const complements = group("complements");
@@ -222,9 +222,7 @@ export function heuristicDossier(
       .slice(0, 6)
       .map((e) => ({ episode_id: e.ownerId, relation: "Relato anterior sobre assunto próximo" })),
     knowledge_gaps: hasMemory
-      ? [
-          "Esta síntese foi produzida por heurística; lacunas conceituais não foram avaliadas.",
-        ]
+      ? ["Esta síntese foi produzida por heurística; lacunas conceituais não foram avaliadas."]
       : [`A biblioteca não cobre: ${truncate(speech, 120)}`],
     central_sources: [...sources.values()]
       .sort((a, b) => b.count - a.count)

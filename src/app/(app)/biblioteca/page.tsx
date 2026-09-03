@@ -67,7 +67,7 @@ export default async function BibliotecaPage() {
           <CardTitle>Documentos</CardTitle>
           <Badge>{sources.length}</Badge>
         </CardHeader>
-        <CardBody className={sources.length ? "divide-y divide-line p-0" : ""}>
+        <CardBody className={sources.length ? "divide-line divide-y p-0" : ""}>
           {sources.length === 0 ? (
             <EmptyState
               title="Nada aqui ainda"
@@ -80,14 +80,14 @@ export default async function BibliotecaPage() {
                 <Link
                   key={source.id}
                   href={`/biblioteca/${source.id}`}
-                  className="block px-5 py-4 transition-colors hover:bg-surface-2"
+                  className="hover:bg-surface-2 block px-5 py-4 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-serif text-[17px] leading-snug text-ink">
+                      <p className="text-ink truncate font-serif text-[17px] leading-snug">
                         {source.title}
                       </p>
-                      <p className="mt-1 truncate text-sm text-ink-faint">
+                      <p className="text-ink-faint mt-1 truncate text-sm">
                         {source.authors?.length ? source.authors.join(", ") : "sem autor informado"}
                         {source.category ? ` · ${source.category}` : ""}
                         {version?.page_count ? ` · ${version.page_count} páginas` : ""}
@@ -96,8 +96,7 @@ export default async function BibliotecaPage() {
                         <StatusBadge status={source.status} />
                         <Badge>{kindLabel(source.kind)}</Badge>
                         {!source.is_active ? <Badge tone="neutral">fora da memória</Badge> : null}
-                        {version?.extraction_quality != null &&
-                        version.extraction_quality < 0.6 ? (
+                        {version?.extraction_quality != null && version.extraction_quality < 0.6 ? (
                           <Badge tone="inference">
                             extração {(version.extraction_quality * 100).toFixed(0)}%
                           </Badge>

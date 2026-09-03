@@ -1,10 +1,6 @@
 import { textQuality } from "./text";
 
-export type ExtractionStatus =
-  | "extracted"
-  | "ocr_required"
-  | "ocr_low_confidence"
-  | "failed";
+export type ExtractionStatus = "extracted" | "ocr_required" | "ocr_low_confidence" | "failed";
 
 export type ExtractionResult = {
   engine: string;
@@ -163,10 +159,13 @@ function extractPlain(file: Uint8Array, format: "md" | "txt"): ExtractionResult 
 export function htmlToMarkdown(html: string): string {
   return html
     .replace(/<\s*br\s*\/?\s*>/gi, "\n")
-    .replace(/<\s*h([1-6])[^>]*>([\s\S]*?)<\s*\/\s*h\1\s*>/gi, (_m, level: string, body: string) => {
-      const title = stripTags(body).trim();
-      return title ? `\n\n${"#".repeat(Number(level))} ${title}\n\n` : "\n\n";
-    })
+    .replace(
+      /<\s*h([1-6])[^>]*>([\s\S]*?)<\s*\/\s*h\1\s*>/gi,
+      (_m, level: string, body: string) => {
+        const title = stripTags(body).trim();
+        return title ? `\n\n${"#".repeat(Number(level))} ${title}\n\n` : "\n\n";
+      },
+    )
     .replace(/<\s*li[^>]*>([\s\S]*?)<\s*\/\s*li\s*>/gi, (_m, body: string) => {
       const item = stripTags(body).trim();
       return item ? `\n- ${item}` : "";

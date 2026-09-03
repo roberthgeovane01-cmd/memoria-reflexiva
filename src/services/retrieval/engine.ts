@@ -166,12 +166,14 @@ export async function runRetrieval(
       .insert(queryRows)
       .select("id, sequence, text, level");
     if (queryError) throw queryError;
-    const queries = (storedQueries as Array<{
-      id: string;
-      sequence: number;
-      text: string;
-      level: string;
-    }>).sort((a, b) => a.sequence - b.sequence);
+    const queries = (
+      storedQueries as Array<{
+        id: string;
+        sequence: number;
+        text: string;
+        level: string;
+      }>
+    ).sort((a, b) => a.sequence - b.sequence);
 
     // Vetores das consultas (uma chamada de embedding por consulta).
     const embeddings = new Map<string, string>();
@@ -183,8 +185,10 @@ export async function runRetrieval(
     const baseSourceIds = await resolveSourceFilter(supabase, input.workspaceId, filters);
 
     // ---- 2. Nível global: quais livros participam? ------------------------
-    const globalLists: Record<string, Array<{ id: string; sourceId: string | null; rank: number }>> =
-      {};
+    const globalLists: Record<
+      string,
+      Array<{ id: string; sourceId: string | null; rank: number }>
+    > = {};
     for (const query of queries) {
       const rows = await hybrid(supabase, {
         workspaceId: input.workspaceId,
@@ -209,8 +213,10 @@ export async function runRetrieval(
       .slice(0, limits.globalSources);
 
     // ---- 3. Nível intermediário: onde, dentro desses livros? --------------
-    const sectionLists: Record<string, Array<{ id: string; sourceId: string | null; rank: number }>> =
-      {};
+    const sectionLists: Record<
+      string,
+      Array<{ id: string; sourceId: string | null; rank: number }>
+    > = {};
     for (const query of queries) {
       const rows = await hybrid(supabase, {
         workspaceId: input.workspaceId,
@@ -238,11 +244,7 @@ export async function runRetrieval(
     const rawScores = new Map<string, HybridRow>();
     const ownerKindById = new Map<string, EvidenceItem["ownerKind"]>();
 
-    const collect = (
-      key: string,
-      rows: HybridRow[],
-      ownerKind: EvidenceItem["ownerKind"],
-    ) => {
+    const collect = (key: string, rows: HybridRow[], ownerKind: EvidenceItem["ownerKind"]) => {
       evidenceLists[key] = rows.map((r, i) => ({
         id: r.owner_id,
         sourceId: r.source_id,
@@ -786,8 +788,7 @@ export function heuristicQueryPlan(inputText: string): QueryPlan {
     .slice(0, 8)
     .map(([, v]) => v.sample);
 
-  const central =
-    sentences.find((s) => s.length > 40) ?? sentences[0] ?? inputText.slice(0, 200);
+  const central = sentences.find((s) => s.length > 40) ?? sentences[0] ?? inputText.slice(0, 200);
 
   const queries: QueryPlan["queries"] = [
     { text: central, rationale: "A fala como foi dita", level: "direct" as const },
