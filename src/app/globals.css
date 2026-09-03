@@ -1,26 +1,203 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ==========================================================================
+   MEMÓRIA REFLEXIVA — sistema visual
+   Calmo, íntimo, editorial. Papel, tinta e um único acento quente.
+   Nada de neon, nada de "cérebro brilhando", nada de estética de chatbot.
+   ========================================================================== */
+
+@theme {
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  color-scheme: light;
+
+  --paper: #f7f5f0;
+  --surface: #fffefb;
+  --surface-2: #f2efe8;
+  --ink: #1c1a17;
+  --ink-soft: #4a4640;
+  --ink-faint: #7d776e;
+  --line: #e2ddd3;
+  --line-strong: #cec8bb;
+
+  --accent: #7a4a2b;
+  --accent-soft: #f0e4d8;
+  --accent-ink: #ffffff;
+
+  --speech: #2f5d50;
+  --speech-soft: #e3efe9;
+  --memory: #4a4b7c;
+  --memory-soft: #e6e6f2;
+  --inference: #7a5c1f;
+  --inference-soft: #f4ebd6;
+  --reflection: #6b2f4a;
+  --reflection-soft: #f4e4ea;
+
+  --danger: #8c2f22;
+  --danger-soft: #f6e3df;
+  --success: #2f6b3f;
+  --success-soft: #e2f0e5;
+
+  --radius: 0.625rem;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --paper: #16150f;
+    --surface: #1e1c17;
+    --surface-2: #262319;
+    --ink: #efe9dd;
+    --ink-soft: #c3bcae;
+    --ink-faint: #8d867a;
+    --line: #322e25;
+    --line-strong: #45402f;
+
+    --accent: #d8a878;
+    --accent-soft: #33291f;
+    --accent-ink: #17140f;
+
+    --speech: #8fc4b1;
+    --speech-soft: #1d2b26;
+    --memory: #a7a8dd;
+    --memory-soft: #22222f;
+    --inference: #d8bd7c;
+    --inference-soft: #2b2618;
+    --reflection: #dd9bb6;
+    --reflection-soft: #2c1e25;
+
+    --danger: #e5978a;
+    --danger-soft: #2e1b18;
+    --success: #8fc79f;
+    --success-soft: #1b2a1f;
   }
 }
 
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --paper: #16150f;
+  --surface: #1e1c17;
+  --surface-2: #262319;
+  --ink: #efe9dd;
+  --ink-soft: #c3bcae;
+  --ink-faint: #8d867a;
+  --line: #322e25;
+  --line-strong: #45402f;
+
+  --accent: #d8a878;
+  --accent-soft: #33291f;
+  --accent-ink: #17140f;
+
+  --speech: #8fc4b1;
+  --speech-soft: #1d2b26;
+  --memory: #a7a8dd;
+  --memory-soft: #22222f;
+  --inference: #d8bd7c;
+  --inference-soft: #2b2618;
+  --reflection: #dd9bb6;
+  --reflection-soft: #2c1e25;
+
+  --danger: #e5978a;
+  --danger-soft: #2e1b18;
+  --success: #8fc79f;
+  --success-soft: #1b2a1f;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-speech: var(--speech);
+  --color-speech-soft: var(--speech-soft);
+  --color-memory: var(--memory);
+  --color-memory-soft: var(--memory-soft);
+  --color-inference: var(--inference);
+  --color-inference-soft: var(--inference-soft);
+  --color-reflection: var(--reflection);
+  --color-reflection-soft: var(--reflection-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --radius-base: var(--radius);
+}
+
+* {
+  border-color: var(--line);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Foco sempre visível — requisito de acessibilidade, não enfeite. */
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+/* Texto literário: a reflexão e os trechos de livro respiram. */
+.prose-editorial {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  letter-spacing: 0.005em;
+}
+
+.prose-editorial p + p {
+  margin-top: 1.1em;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+}
+
+.skip-link:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
