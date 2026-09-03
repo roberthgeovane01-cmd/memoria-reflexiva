@@ -122,18 +122,33 @@ export function applySourceDiversity(
     };
   });
 
+  // Primeiro preenche com quem está dentro do limite por fonte.
   const eligible = scored
     .filter((i) => i.discardReason === null)
     .sort((a, b) => b.adjustedScore - a.adjustedScore);
 
   const selected = new Set(eligible.slice(0, options.limit).map((i) => i.id));
 
+  // O teto por fonte é uma preferência, não um desperdício: se sobraram vagas,
+  // elas são preenchidas pelos melhores candidatos que estouraram o teto — já
+  // penalizados. Melhor um trecho a mais da mesma fonte do que uma vaga vazia.
+  if (selected.size < options.limit) {
+    const overflow = scored
+      .filter((i) => !selected.has(i.id))
+      .sort((a, b) => b.adjustedScore - a.adjustedScore);
+    for (const item of overflow) {
+      if (selected.size >= options.limit) break;
+      selected.add(item.id);
+    }
+  }
+
   return scored
     .map((item) => ({
       ...item,
       selected: selected.has(item.id),
-      discardReason:
-        item.discardReason ?? (selected.has(item.id) ? null : "fora do limite de resultados"),
+      discardReason: selected.has(item.id)
+        ? null
+        : (item.discardReason ?? "fora do limite de resultados"),
     }))
     .sort((a, b) => b.adjustedScore - a.adjustedScore);
 }

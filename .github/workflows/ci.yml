@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verificar:
+    name: typecheck · lint · testes · build
+    runs-on: ubuntu-latest
+
+    env:
+      # Valores de fachada: o build não fala com o Supabase, mas a validação
+      # de ambiente exige que as variáveis existam.
+      NEXT_PUBLIC_SUPABASE_URL: https://exemplo.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: chave-publica-de-ci
+      # Sem chaves de IA: a CI roda em modo demonstração de propósito, o que
+      # garante que o aplicativo continua funcionando sem nenhum fornecedor.
+      NEXT_TELEMETRY_DISABLED: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Verificar formatação
+        run: npm run format:check
+
+      - name: Verificação de tipos
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Testes unitários
+        run: npm test
+
+      - name: Build de produção
+        run: npm run build
+
+  migrations:
+    name: migrations aplicam do zero
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Subir Postgres local e aplicar todas as migrations
+        run: supabase db start
+
+      - name: Conferir que não há desvio entre migrations e schema
+        run: supabase db diff --schema public --linked=false | tee /tmp/diff.txt && test ! -s /tmp/diff.txt

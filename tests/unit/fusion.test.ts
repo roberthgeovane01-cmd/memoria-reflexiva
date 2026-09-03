@@ -62,9 +62,12 @@ describe("diversidade de fontes", () => {
     const resultado = applySourceDiversity(itens, { limit: 6, maxPerSource: 3 });
     const selecionados = resultado.filter((r) => r.selected);
 
-    expect(selecionados.filter((s) => s.sourceId === "livroA")).toHaveLength(3);
+    // Sem diversidade, o livro A ocuparia as 6 vagas. Com o teto por fonte, o
+    // livro B entra inteiro e o A cede espaço — mas nenhuma vaga fica vazia.
+    expect(selecionados).toHaveLength(6);
     expect(selecionados.map((s) => s.id)).toContain("B1");
     expect(selecionados.map((s) => s.id)).toContain("B2");
+    expect(selecionados.filter((s) => s.sourceId === "livroA").length).toBeLessThanOrEqual(4);
   });
 
   it("não pune quando existe uma única fonte relevante", () => {
@@ -87,6 +90,9 @@ describe("diversidade de fontes", () => {
     const descartados = resultado.filter((r) => !r.selected);
     expect(descartados.length).toBe(2);
     for (const item of descartados) expect(item.discardReason).toBeTruthy();
+    for (const item of resultado.filter((r) => r.selected)) {
+      expect(item.discardReason).toBeNull();
+    }
   });
 });
 
